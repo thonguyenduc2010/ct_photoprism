@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  photoprism:
+    image: photoprism/photoprism:latest
+    container_name: photoprism
+    restart: unless-stopped
+    ports:
+      - "2342:2342"
+    environment:
+      PHOTOPRISM_ADMIN_PASSWORD: "strongpassword"
+      PHOTOPRISM_AUTH_MODE: "password"
+      PHOTOPRISM_PUBLIC: "false"
+      PHOTOPRISM_ORIGINALS_LIMIT: 50000
+      PHOTOPRISM_SITE_TITLE: "Ảnh bệnh viện - Hệ thống HIS"
+    volumes:
+      - /mnt/photos/originals:/photoprism/originals
+      - /mnt/photos/storage:/photoprism/storage
+    depends_on:
+      - mariadb
+    networks:
+      - photonet
+
+  mariadb:
+    image: mariadb:10.5
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: photoprism
+      MYSQL_DATABASE: photoprism
+      MYSQL_USER: photoprism
+      MYSQL_PASSWORD: photoprism
+    volumes:
+      - mariadb:/var/lib/mysql
+    networks:
+      - photonet
+
+volumes:
+  mariadb:
+
+networks:
+  photonet:
